@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -44,11 +44,11 @@ class HomeController extends Controller
     {
         // 連線到資料庫
         DB::connection('mysql');
-
+        $randomNumber=rand(1,100);
+        $t=strtotime('+0 hoirs');
+        DB::insert('insert into chart (value,time) values(?,?)',[ $randomNumber, date('y-md H:i:s',$t)]);
         $data = [
-            $t = strtotime('+8 hours'),
             'time' => date('Y-m-d H:i:s', $t),
-
             // 取值
             'value' => DB::table('chart')->orderBy('id', 'desc')->limit(1)->value('value')
         ];
@@ -56,7 +56,7 @@ class HomeController extends Controller
         $response = new StreamedResponse();
         $response->setCallback(function () use ($data) {
             echo 'data: ' . json_encode($data) . "\n\n";
-            echo "retry: 1000\n";
+            echo "retry: 5000\n";
             ob_flush();
             flush();
         });
